@@ -1,0 +1,1 @@
+This folder contains context diagrams.

@@ -1,0 +1,92 @@
+// THIS IS THE FUNCTION YOU IMPLEMENT
+// A helper function to find the optimised path to the target
+int find_path(int raw_count, int r_x, int r_y, int t_x, int t_y, char*world) {
+    // In the target
+    if (r_x == t_x && r_y == t_y) { 
+        return 6;     
+    }
+
+    // Calculate possible ways
+    int robot_index = r_x*raw_count + r_y;
+    int down = (r_x+1)*raw_count + r_y;
+    int right = r_x*raw_count + r_y+1;
+    int up = (r_x-1)*raw_count + r_y;
+    int left = r_x*raw_count + r_y-1;
+
+    // Mark the index as visited so robot won't come again to the same position
+    char character_copy[4] = {world[robot_index+raw_count], world[robot_index+1], world[robot_index-raw_count], world[robot_index-1]};
+    world[robot_index] = 'V';
+    char target_char = (rescued > 0) ? 'X' : 'T';
+
+    // South
+    if(r_x < t_x && (world[down] == 'O' || world[down] == '~' || world[down] == target_char) && find_path(raw_count, r_x+1, r_y, t_x, t_y, world)) {
+        if(character_copy[0] != coming_from && character_copy[0] != 'T' && character_copy[0] != 'X' && ((coming_from == 'O' && driving_mode == 0) || (coming_from == '~' && driving_mode == 1) || (coming_from == 'X' && driving_mode == 0))) { 
+            if(character_copy[0] == 'O' && coming_from == 'X') { return 3; }
+            return 5; 
+        }
+        return 3;
+    }
+
+    // East 
+    else if(r_y < t_y && (world[right] == 'O' || world[right] == '~' || world[right] == target_char) && find_path(raw_count, r_x, r_y+1, t_x, t_y, world)) {
+        if(character_copy[1] != coming_from && character_copy[1] != 'T' && character_copy[1] != 'X' && ((coming_from == 'O' && driving_mode == 0) || (coming_from == '~' && driving_mode == 1) || (coming_from == 'X' && driving_mode == 0))) { 
+            if(character_copy[1] == 'O' && coming_from == 'X') { return 2; }
+            return 5; 
+        }
+        return 2;
+    }
+
+    // North
+    else if(r_x > t_x && (world[up] == 'O' || world[up] == '~' || world[up] == target_char) && find_path(raw_count, r_x-1, r_y, t_x, t_y, world)) {
+        if(character_copy[2] != coming_from && character_copy[2] != 'T' && character_copy[2] != 'X' && ((coming_from == 'O' && driving_mode == 0) || (coming_from == '~' && driving_mode == 1) || (coming_from == 'X' && driving_mode == 0))) { 
+            if(character_copy[2] == 'O' && coming_from == 'X') { return 1; }
+            return 5; 
+        }
+        return 1;
+    } 
+
+    // West
+    else if(r_y > t_y && (world[left] == 'O' || world[left] == '~' || world[left] == target_char) && find_path(raw_count, r_x, r_y-1, t_x, t_y, world)) {
+        if(character_copy[3] != coming_from && character_copy[3] != 'T' && character_copy[3] != 'X' && ((coming_from == 'O' && driving_mode == 0) || (coming_from == '~' && driving_mode == 1) || (coming_from == 'X' && driving_mode == 0))) { 
+            if(character_copy[3] == 'O' && coming_from == 'X') { return 4; }
+            return 5; 
+        }
+        return 4;
+    }
+    
+    // There is no path further
+    return 0;
+}
+
+// Move the robot accordingly
+int move(char *world) {
+    int robot_index, target_index, raw_count, check = 1;
+    int r_x, r_y, t_x, t_y;
+
+    // Get a copy
+    char temp[200];
+    for (int i = 0; i < 200; i++) { temp[i] = world[i]; }
+    
+    unsigned int elements = sizeof(temp)/sizeof(temp[0]);
+    
+    // Calculate actual index
+    for(int i = 0; i < elements; i++) {
+        if (temp[i] == 'R') { robot_index = i; }
+        if (temp[i] == 'T' && rescued == 0) { target_index = i; }
+        if (temp[i] == 'X' && rescued > 0) { target_index = i; }
+
+        if (check == 1 && temp[i] == '\n') { 
+            raw_count = i+1;
+            check = 0;
+        }
+    }
+
+    // Map indexes into x,y coordinates
+    r_x = robot_index / raw_count;
+    t_x = target_index / raw_count;
+    r_y = robot_index % raw_count;
+    t_y = target_index % raw_count;
+
+    
+    return find_path(raw_count, r_x, r_y, t_x, t_y, temp);
+}

@@ -1,0 +1,1 @@
+This folder contains sketches and models of the prototype.

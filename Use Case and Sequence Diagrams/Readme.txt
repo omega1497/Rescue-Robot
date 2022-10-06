@@ -1,0 +1,1 @@
+This file contains Use Case Diagrams.
